@@ -2,6 +2,7 @@ package me.powerarc.flowsubject.extension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,12 @@ public class ExtensionService {
 	protected final ExtensionRepository repository;
 
 	public ExtensionResponse create(String name) {
+		validate(name);
+		return save(name).toResponse();
+	}
+
+	public void validate(String name) {
+		name = name.toLowerCase();
 		if (repository.count() >= 200 + AppConfig.fixedExtensions.length) {
 			throw new ExtensionException(ErrorCode.TotalExtensionSizeOver);
 		}
@@ -31,7 +38,23 @@ public class ExtensionService {
 		if (exists(name)) {
 			throw new ExtensionException(ErrorCode.DuplicatedExtension);
 		}
-		return save(name).toResponse();
+		if (name.contains(" ")) {
+			throw new ExtensionException(ErrorCode.WrongName);
+		}
+		char[] arr = name.toCharArray();
+		if (!Character.isAlphabetic(arr[0])) {
+			throw new ExtensionException(ErrorCode.WrongName);
+		}
+		for (int i = 0; i < arr.length; i++) {
+			if (!Pattern.matches("^[a-zA-Z0-9]*$", name)) {
+				throw new ExtensionException(ErrorCode.WrongName);
+			}
+		}
+		for (char c : arr) {
+			if (!Character.isAlphabetic(c) && !Character.isDigit(c)) {
+				throw new ExtensionException(ErrorCode.WrongName);
+			}
+		}
 	}
 
 	public Extension save(String name) {

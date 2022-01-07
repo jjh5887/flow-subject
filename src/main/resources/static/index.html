@@ -121,9 +121,9 @@
             }
 
             document.getElementById('custom-extension-btn').addEventListener('click', function () {
-                let extensionName = document.getElementById('custom-extension-search').value.trim();
-                if (extensionName.length == 0) {
-                    alert('공백입니다.')
+                let extensionName = document.getElementById('custom-extension-search').value;
+                if (extensionName.indexOf(" ") !== -1) {
+                    alert('공백이 있을 수 없습니다.');
                     return;
                 }
                 document.getElementById('custom-extension-search').setAttribute('value', '');

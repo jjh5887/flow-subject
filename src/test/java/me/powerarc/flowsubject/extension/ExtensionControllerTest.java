@@ -102,6 +102,42 @@ class ExtensionControllerTest {
 	}
 
 	@Test
+	public void create_wrong_name() throws Exception {
+		// When
+		// 공백 확장자 생성
+		String extensionName = "te st";
+		int totalSize = extensionService.getAll().size();
+		mockMvc.perform(post("/extension/" + extensionName)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isBadRequest());
+
+		// 숫자로 시작
+		extensionName = "1test";
+		mockMvc.perform(post("/extension/" + extensionName)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isBadRequest());
+
+		// 특수 문자
+		extensionName = "t^^est";
+		mockMvc.perform(post("/extension/" + extensionName)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isBadRequest());
+
+		// 한글
+		extensionName = "t안녕est";
+		mockMvc.perform(post("/extension/" + extensionName)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isBadRequest());
+
+		// Then
+		assertThat(extensionService.getAll().size()).isEqualTo(totalSize);
+	}
+
+	@Test
 	public void create_too_long_name() throws Exception {
 		// When
 		// 이름이 긴 확장자 생성

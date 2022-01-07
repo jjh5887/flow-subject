@@ -8,7 +8,9 @@ public enum ErrorCode {
 	ExtensionNotFound(400, "없는 확장자 입니다."),
 	NameSizeOver(400, "이름이 20자 이상 초과할 수 없습니다."),
 	TotalExtensionSizeOver(400, "확장자를 더 이상 늘릴 수 없습니다."),
-	DeleteFixedExtensionNotAllowed(400, "고정 확장자는 삭제할 수 없습니다.");
+	DeleteFixedExtensionNotAllowed(400, "고정 확장자는 삭제할 수 없습니다."),
+	WrongName(400, "잘못된 확장자 이름 형식입니다.")
+	;
 
 	private int status;
 	private String message;
