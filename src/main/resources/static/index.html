@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>확장자</title>
+    <style>
+        .rounded {
+            display: inline-block;
+            border: 1px solid black;
+            border-radius: 15px;
+            width: max-content;
+            padding: 4px;
+            margin: 4px;
+        }
+
+        .boxed {
+            display: inline-block;
+            border: 1px solid black;
+            border-radius: 15px;
+            width: 1000px;
+            height: 300px;
+            padding: 4px;
+            margin: 4px;
+            overflow: auto
+        }
+
+        .close {
+            display: inline-block;
+            margin: 4px;
+        }
+
+        .close:after {
+            display: inline-block;
+            content: "\00d7";
+            font-size: 15pt;
+        }
+
+    </style>
+    <script>
+        const now = (function () {
+            let _cnt = 0;
+            return {
+                get cnt() {
+                    return _cnt;
+                },
+                set cnt(value) {
+                    _cnt = value;
+                    document.getElementById('now-cnt').innerText = _cnt;
+                }
+            };
+        })();
+
+        function generateFixedExtension(data, i) {
+            let inputElement = document.createElement('input');
+            inputElement.type = 'checkbox';
+            inputElement.value = data[i].name;
+            inputElement.id = 'fixed-extension-' + i;
+            inputElement.checked = data[i].isChecked;
+            inputElement.style.margin = '8px';
+
+            inputElement.addEventListener('change', function () {
+                let request = new XMLHttpRequest();
+                let url = 'http://localhost:8080/fixed-extension/' + this.value + '/' + this.checked;
+                request.open('PUT', url);
+                request.responseType = 'json';
+                request.send();
+            });
+
+            var labelElement = document.createElement('label');
+            labelElement.setAttribute('for', 'fixed-extension-' + i);
+            labelElement.innerText = data[i].name;
+            labelElement.style.fontSize = '20px';
+
+            document.getElementById("fixed-extension").appendChild(labelElement);
+            document.getElementById("fixed-extension").appendChild(inputElement);
+            return labelElement;
+        }
+
+        function generateCustomExtension(name) {
+            now.cnt = now.cnt + 1;
+            let element = document.createElement('p');
+            element.innerText = name;
+            element.className = 'rounded';
+
+            let spanElement = document.createElement('p');
+            spanElement.id = name;
+            spanElement.className = 'close';
+            spanElement.addEventListener('click', function () {
+                let request = new XMLHttpRequest();
+                let url = 'http://localhost:8080/extension/' + this.id;
+                request.open('DELETE', url);
+                request.responseType = 'json';
+                request.send();
+                let parent = this.parentElement;
+                request.onload = function () {
+                    now.cnt = now.cnt - 1;
+                    document.getElementById('custom-extension-box').removeChild(parent);
+                }
+            });
+
+            element.appendChild(spanElement);
+            document.getElementById('custom-extension-box').appendChild(element);
+        }
+
+        window.onload = function () {
+            let request = new XMLHttpRequest();
+            document.getElementById('now-cnt').innerText = 0;
+            let fixedExtensionUrl = 'http://localhost:8080/extension';
+            request.open('GET', fixedExtensionUrl);
+            request.responseType = 'json';
+            request.send();
+            request.onload = function () {
+                const data = request.response;
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].isChecked !== undefined) {
+                        generateFixedExtension(data, i);
+                    } else {
+                        generateCustomExtension(data[i].name);
+                    }
+                }
+            }
+
+            document.getElementById('custom-extension-btn').addEventListener('click', function () {
+                let extensionName = document.getElementById('custom-extension-search').value.trim();
+                if (extensionName.length == 0) {
+                    alert('공백입니다.')
+                    return;
+                }
+                document.getElementById('custom-extension-search').setAttribute('value', '');
+                let url = 'http://localhost:8080/extension/' + extensionName;
+                request.open('POST', url);
+                request.responseType = 'json';
+                request.send();
+                request.onload = function () {
+                    document.getElementById('custom-extension-search').value = '';
+                    if (request.status == 400) {
+                        alert(request.response.message);
+                    } else {
+                        generateCustomExtension(extensionName, request);
+                    }
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+<h1>@파일 확장자 차단</h1>
+<hr>
+<h3>파일확장자에 따라 특정 형식의 파일을 첨부하거나 전송하지 못하도록 제한</h3>
+<ul>
+    <li>
+        <div id="fixed-extension"><span style="font-size: 20px">고정 확장자 : </span></div>
+    </li>
+    <li>
+
+    </li>
+</ul>
+<ul>
+    <li>
+        <div id="custom-extension"><span style="font-size: 20px">커스텀 확장자 : </span>
+            <input id="custom-extension-search" type="text" placeholder="확장자 입력">
+            <input id="custom-extension-btn" type="button" value="+추가">
+        </div>
+    </li>
+    <li>
+        <div class="boxed" id="custom-extension-box">
+            <div><span id="now-cnt"></span><span>/ 200</span></div>
+        </div>
+    </li>
+</ul>
+
+</body>
+</html>
