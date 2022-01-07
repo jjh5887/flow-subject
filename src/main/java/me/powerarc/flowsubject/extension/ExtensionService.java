@@ -13,6 +13,7 @@ import me.powerarc.flowsubject.config.AppConfig;
 import me.powerarc.flowsubject.exception.ErrorCode;
 import me.powerarc.flowsubject.exception.ExtensionException;
 import me.powerarc.flowsubject.extension.response.ExtensionResponse;
+import me.powerarc.flowsubject.fixed.FixedExtension;
 
 @Service
 @Transactional
@@ -61,6 +62,10 @@ public class ExtensionService {
 	}
 
 	public void delete(String name) {
-		repository.delete(get(name));
+		Extension extension = get(name);
+		if (extension instanceof FixedExtension) {
+			throw new ExtensionException(ErrorCode.DeleteFixedExtensionNotAllowed);
+		}
+		repository.delete(extension);
 	}
 }

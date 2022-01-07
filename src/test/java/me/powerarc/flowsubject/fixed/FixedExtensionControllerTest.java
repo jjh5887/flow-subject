@@ -30,28 +30,35 @@ class FixedExtensionControllerTest {
 
 	@Test
 	public void create() throws Exception {
+		// 고정 확장자 생성 허용 X
 		mockMvc.perform(post("/fixed-extension/testtest"))
 			.andExpect(status().isMethodNotAllowed());
 	}
 
 	@Test
 	public void delete() throws Exception {
+		// 고정 확장자 삭제 허용 X
 		mockMvc.perform(MockMvcRequestBuilders.delete("/fixed-extension/testtest"))
 			.andExpect(status().isMethodNotAllowed());
 	}
 
 	@Test
 	public void update() throws Exception {
+		// When
+		// 고정 확장자
 		List<ExtensionResponse> responses = fixedExtensionService.getAll();
 		for (ExtensionResponse response : responses) {
 			FixedExtensionResponse fixedExtensionResponse = (FixedExtensionResponse)response;
 			assertThat(fixedExtensionResponse.getIsChecked()).isEqualTo(false);
 		}
 		ExtensionResponse response = responses.get(0);
+
+		// 고정확장자 true 로 변경
 		mockMvc.perform(put("/fixed-extension/" + response.getName() + "/true"))
 			.andDo(print())
 			.andExpect(status().isOk());
 
+		// Then
 		FixedExtension extension = (FixedExtension)fixedExtensionService.get(response.getName());
 		assertThat(extension.getIsChecked()).isEqualTo(true);
 	}
