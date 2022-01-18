@@ -60,7 +60,7 @@
 
             inputElement.addEventListener('change', function () {
                 let request = new XMLHttpRequest();
-                let url = 'http://localhost:8080/fixed-extension/' + this.value + '/' + this.checked;
+                let url = '/fixed-extension/' + this.value + '/' + this.checked;
                 request.open('PUT', url);
                 request.responseType = 'json';
                 request.send();
@@ -87,7 +87,7 @@
             spanElement.className = 'close';
             spanElement.addEventListener('click', function () {
                 let request = new XMLHttpRequest();
-                let url = 'http://localhost:8080/extension/' + this.id;
+                let url = '/extension/' + this.id;
                 request.open('DELETE', url);
                 request.responseType = 'json';
                 request.send();
@@ -105,7 +105,7 @@
         window.onload = function () {
             let request = new XMLHttpRequest();
             document.getElementById('now-cnt').innerText = 0;
-            let fixedExtensionUrl = 'http://localhost:8080/extension';
+            let fixedExtensionUrl = '/extension';
             request.open('GET', fixedExtensionUrl);
             request.responseType = 'json';
             request.send();
@@ -127,7 +127,7 @@
                     return;
                 }
                 document.getElementById('custom-extension-search').setAttribute('value', '');
-                let url = 'http://localhost:8080/extension/' + extensionName;
+                let url = '/extension/' + extensionName;
                 request.open('POST', url);
                 request.responseType = 'json';
                 request.send();
