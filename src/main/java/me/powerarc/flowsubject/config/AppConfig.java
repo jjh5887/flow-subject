@@ -47,7 +47,7 @@ public class AppConfig {
 			@Override
 			public void run(ApplicationArguments args) {
 				for (int i = 0; i < 199; i++) {
-					extensionService.create(i + "test");
+					extensionService.create("test" + i);
 				}
 			}
 		};
